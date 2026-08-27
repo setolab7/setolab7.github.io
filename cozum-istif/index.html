@@ -738,6 +738,11 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   .band .btn{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg stroke='%230A0E13' stroke-width='1.5' stroke-linejoin='round'%3E%3Crect x='2.6' y='3' width='9' height='6.2' rx='1.2' fill='%2316A94A'/%3E%3Cpath d='M2.2 9.2h10.4v3.3H2.2z' fill='%23E6ECF2'/%3E%3Cpath d='M12 3.2h3.7v23.4H12z' fill='%23E6ECF2'/%3E%3Cpath d='M15.7 4.1h11.2v2.3H15.7z' fill='%23E6ECF2'/%3E%3Cpath d='M24.7 6.4h2.3v9.1h-2.3z' fill='%23E6ECF2'/%3E%3Cpath d='M15.7 15.3h13.2v8.7a1.4 1.4 0 0 1-1.4 1.4H15.7z' fill='%2316A94A'/%3E%3C/g%3E%3Cg fill='%230A0E13'%3E%3Ccircle cx='19' cy='26' r='3.6'/%3E%3Ccircle cx='26.2' cy='26' r='3.6'/%3E%3C/g%3E%3Cg fill='%238FA3B5'%3E%3Ccircle cx='19' cy='26' r='1.35'/%3E%3Ccircle cx='26.2' cy='26' r='1.35'/%3E%3C/g%3E%3C/svg%3E") 2 11, pointer}
 }
 
+/* Kaydırma bu cihazda çalışmıyorsa (iOS'ta olabiliyor) sayfayı bozuk
+   bırakmayız, tasarlanmış durağan kahramana düşeriz. */
+body.scrub-dead .hero{display:none}
+body.scrub-dead .static-hero{display:flex}
+
 /* durağan kahraman kapıları: bu iki sorgu JS tarafındakiyle harfi harfine aynı.
    Telefon artık kaydırmalı videoyu görüyor, o yüzden sadece yan yatmış kısa
    ekran ve hareket azaltma tercihi durağan kahramana düşüyor. */
@@ -1488,6 +1493,8 @@ function requestSeek(t){
 }
 video.addEventListener('seeked',function(){
   seekBusy=false;
+  seekEverCompleted=true;
+  if(healthTimer){clearTimeout(healthTimer);healthTimer=null;}
   if(pendingTime!==null){var t=pendingTime;pendingTime=null;requestSeek(t);}
 });
 video.addEventListener('error',function(){seekBusy=false;pendingTime=null;failVideo();});
@@ -1550,6 +1557,76 @@ function failVideo(){
     ring.parentNode.replaceChild(ch,ring);ring=null;
   }
 }
+/* ============================================================
+   iOS kilidi. Safari, hic oynatilmamis bir videonun karesini
+   currentTime ile bastirmiyor; once kullanici hareketiyle
+   tetiklenmis bir play/pause gerekiyor. Bu olmadan iPhone'da
+   kaydirmali video sessizce olu kaliyor.
+   ============================================================ */
+var videoUnlocked=false;
+function unlockVideo(){
+  if(videoUnlocked||!video.src) return;
+  videoUnlocked=true;
+  try{
+    var pr=video.play();
+    if(pr&&pr.then) pr.then(function(){try{video.pause();}catch(e){}}).catch(function(){});
+    else { try{video.pause();}catch(e){} }
+  }catch(e){}
+}
+['touchstart','pointerdown','mousedown','click','keydown'].forEach(function(t){
+  window.addEventListener(t,unlockVideo,{passive:true});
+});
+
+/* Kaydirma gercekten calisiyor mu. Calismiyorsa sayfayi bozuk
+   birakmak yerine tasarlanmis duragan kahramana dusuyoruz. */
+var seekEverCompleted=false, healthTimer=null;
+function armSeekHealth(){
+  if(healthTimer) return;
+  healthTimer=setTimeout(function(){
+    if(!seekEverCompleted) scrubDead();
+  },7000);
+}
+function scrubDead(){
+  document.body.classList.add('scrub-dead');
+  disableScrub();
+  if(stage) stage.classList.remove('video-ready');
+}
+
+/* Sunucu parcali indirmeyi (Range) destekliyorsa videoyu dogrudan
+   baglariz: tarayici sadece ihtiyaci olan parcayi ceker. Telefonda
+   2,8 MB'lik dosyanin tamamini indirmek gerekmez ve iOS bu yolda
+   cok daha guvenilir. Desteklemiyorsa Blob yoluna duseriz. */
+function initVideoSource(){
+  var zaman=setTimeout(function(){baglaBlob();},2500);   // HEAD takilirsa bekletme
+  var karar=false;
+  fetch(VIDEO_URL,{method:'HEAD'}).then(function(res){
+    var ar=(res.headers.get('accept-ranges')||'').toLowerCase();
+    if(karar) return; karar=true; clearTimeout(zaman);
+    if(res.ok&&ar.indexOf('bytes')>-1) baglaDogrudan(); else baglaBlob();
+  }).catch(function(){
+    if(karar) return; karar=true; clearTimeout(zaman);
+    baglaBlob();
+  });
+  function baglaBlob(){ if(!video.src) loadHeroBlob().catch(failVideo); }
+  function baglaDogrudan(){ if(!video.src) attachDirect(); }
+}
+
+function attachDirect(){
+  video.preload='auto';
+  video.src=VIDEO_URL;
+  video.load();
+  var son=0;
+  video.addEventListener('progress',function(){
+    if(!ring||!video.duration) return;
+    var b=video.buffered;
+    if(!b.length) return;
+    var frac=Math.min(1,b.end(b.length-1)/video.duration);
+    var now=performance.now();
+    if(now-son>100||frac===1){son=now;ring.style.setProperty('--ld',Math.round(126*(1-frac)));}
+  });
+  wireReady();
+}
+
 function loadHeroBlob(){
   var ctrl=new AbortController();
   var watchdog=setTimeout(function(){ctrl.abort();},20000);
@@ -1577,18 +1654,27 @@ function attachBlob(blob){
   if(ring) ring.style.setProperty('--ld',0);
   video.src=URL.createObjectURL(blob);
   video.load();
+  wireReady();
+}
+
+function wireReady(){
+  video.addEventListener('loadedmetadata',function(){unlockVideo();},{once:true});
   video.addEventListener('canplay',function(){
+    if(ring) ring.style.setProperty('--ld',0);
+    unlockVideo();
     if(video.duration) requestSeek(heroProgress()*video.duration);
     stage.classList.add('video-ready');
+    armSeekHealth();
   },{once:true});
 }
+
 function initHeroOnce(){
   if(videoStarted) return;
   videoStarted=true;
   poster.style.backgroundImage="url('assets/hero-poster.jpg')";
   loadStart=performance.now();
   var started=false;
-  function start(){if(started)return;started=true;loadHeroBlob().catch(failVideo);}
+  function start(){if(started)return;started=true;initVideoSource();}
   var pi=new Image();pi.onload=start;pi.onerror=start;pi.src='assets/hero-poster.jpg';
   setTimeout(start,4000);
 }
