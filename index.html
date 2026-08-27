@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Örnek Çalışmalar</title>
+<meta name="description" content="İşletmeler için hazırlanmış web sitesi örnekleri.">
+<meta name="theme-color" content="#0B0E12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{
+    --bg:#0B0E12; --panel:#12171E; --line:#1F2932;
+    --ink:#E8EDF2; --ink-dim:#9BA9B6; --ink-faint:#6B7A88;
+    --accent:#16A94A;
+    --r:14px;
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px; margin:0 auto; padding:0 24px}
+
+  header{padding:72px 0 44px; border-bottom:1px solid var(--line)}
+  .eyebrow{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); font-weight:600; margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(28px,5vw,42px); font-weight:800; letter-spacing:-.02em;
+    margin:0 0 16px; line-height:1.15;
+  }
+  .lede{font-size:clamp(15px,2vw,17px); color:var(--ink-dim); max-width:60ch; margin:0}
+
+  .grid{
+    display:grid; gap:28px; padding:44px 0 8px;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  }
+  .card{
+    display:flex; flex-direction:column;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+    overflow:hidden; text-decoration:none; color:inherit;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .card:hover,.card:focus-visible{border-color:var(--accent); transform:translateY(-3px)}
+  .card:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .shot{
+    aspect-ratio:16/10; width:100%; object-fit:cover; display:block;
+    background:#0A0A0B; border-bottom:1px solid var(--line);
+  }
+  .body{padding:22px 22px 24px; display:flex; flex-direction:column; gap:10px; flex:1}
+  .card h2{font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em}
+  .sector{font-size:12.5px; color:var(--ink-faint); margin:0}
+  .card p.desc{font-size:14.5px; color:var(--ink-dim); margin:4px 0 0}
+  .tags{display:flex; flex-wrap:wrap; gap:7px; margin-top:auto; padding-top:16px}
+  .tag{
+    font-size:11.5px; color:var(--ink-dim);
+    border:1px solid var(--line); border-radius:999px; padding:4px 10px;
+  }
+  .go{
+    font-size:13.5px; font-weight:600; color:var(--accent);
+    margin-top:14px; display:inline-flex; align-items:center; gap:6px;
+  }
+
+  .note{
+    margin:40px 0 0; padding:18px 20px;
+    border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:0 var(--r) var(--r) 0; background:var(--panel);
+    font-size:13.5px; color:var(--ink-dim);
+  }
+  footer{
+    margin-top:56px; padding:26px 0 60px; border-top:1px solid var(--line);
+    font-size:13px; color:var(--ink-faint);
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Örnek Çalışmalar</p>
+    <h1>İşletmeler için web sitesi</h1>
+    <p class="lede">
+      Aşağıdaki iki site gerçek Bursa firmaları için hazırlandı. Tasarım, metin,
+      görsel düzenleme ve kodun tamamı bana ait. Sayfaları telefonda da açıp
+      inceleyebilirsiniz.
+    </p>
+  </header>
+
+  <div class="grid">
+
+    <a class="card" href="cozum-istif/">
+      <img class="shot" src="cozum-istif/assets/hero-poster.jpg" alt="Çözüm İstif sitesinin açılış ekranı" loading="lazy" width="800" height="500">
+      <div class="body">
+        <h2>Çözüm İstif Makinaları</h2>
+        <p class="sector">Bursa · Forklift satış, kiralama ve servis</p>
+        <p class="desc">
+          Kaydırdıkça ilerleyen video ile açılan tek sayfalık kurumsal site.
+          Makine filosu, servis ağı, yedek parça ve müşteri yorumları tek akışta.
+          Logo, siteye özel vektör olarak yeniden çizildi.
+        </p>
+        <div class="tags">
+          <span class="tag">Tek sayfa</span>
+          <span class="tag">Video kahraman</span>
+          <span class="tag">Vektör logo</span>
+          <span class="tag">Google yapısal veri</span>
+        </div>
+        <span class="go">Siteyi aç &rarr;</span>
+      </div>
+    </a>
+
+    <a class="card" href="bademli-garage/">
+      <img class="shot" src="bademli-garage/foto/kare-911.jpg" alt="Bademli Garage sitesinde yer alan kaplama işi" loading="lazy" width="800" height="500">
+      <div class="body">
+        <h2>Bademli Garage</h2>
+        <p class="sector">Bursa Mudanya · Araç kaplama ve PPF</p>
+        <p class="desc">
+          Koyu stüdyo diliyle kurulmuş tanıtım sitesi ve ayrı bir iş arşivi.
+          Film yüzeyi seçici, tür filtreli galeri ve tam ekran görsel
+          büyütme. Müşteri plakaları kapatıldı.
+        </p>
+        <div class="tags">
+          <span class="tag">Çok sayfa</span>
+          <span class="tag">Filtreli galeri</span>
+          <span class="tag">Işık kutusu</span>
+          <span class="tag">Renk seçici</span>
+        </div>
+        <span class="go">Siteyi aç &rarr;</span>
+      </div>
+    </a>
+
+  </div>
+
+  <p class="note">
+    Bu sayfalar tanıtım amaçlı örnek çalışmalardır. Firmaların kendi resmî
+    siteleri değildir ve arama motorlarına kapalıdır.
+  </p>
+
+  <footer>
+    Sitelerin tamamı elle kodlandı. Hazır şablon veya sayfa kurucu kullanılmadı.
+  </footer>
+
+</div>
+
+</body>
+</html>

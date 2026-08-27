@@ -1,0 +1,7 @@
+# GitHub Pages deposu: sadece yayina cikacak dosyalar izinli.
+/*
+!/.gitignore
+!/.nojekyll
+!/index.html
+!/cozum-istif/
+!/bademli-garage/
