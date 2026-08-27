@@ -691,8 +691,14 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
    ============================================================ */
 @media (max-width:820px), (orientation:portrait) and (max-width:1024px){
   .hero{height:500vh}
+  /* yatay video dikey ekranda makinenin uzerine kaydirilir */
   .stage video,.poster{object-position:62% 50%}
   .poster{background-position:62% 50%}
+  /* telefon surumu zaten dikey kirpilmis geldi, ortalanmasi yeter */
+  :root.mobil-video .stage video{object-position:50% 50%}
+  :root.mobil-video .poster{background-position:50% 50%}
+  /* duragan kahraman da hafif surumun bitis karesini kullansin */
+  .sh-media{background-image:url('assets/hero-ending-mobile.jpg')}
 
   .band{align-items:flex-end}
   .band-inner{width:100%;margin-left:0;padding:0 var(--pad) clamp(74px,13vh,120px)}
@@ -1457,8 +1463,19 @@ fillMarquee(document.getElementById('mq2'),REFS.slice(half));
 /* ============================================================
    Kahraman
    ============================================================ */
-var VIDEO_URL='assets/hero-scrub.mp4';
-var VIDEO_BYTES=2821036;
+/* Telefon kendi videosunu aliyor. Yatay video dikey ekranda zaten
+   ortadan kirpiliyordu, o yuzden dikey olarak onceden kirpilmis ve
+   hafifletilmis bir surum var: 432x768, 788 KB. Cozulecek piksel
+   sayisi yuzde 69 az, kaydirirken sicrama biten sey de bu.
+   CSS'teki telefon bloguyla ayni sorgu. */
+var MOBIL_SORGU='(max-width:820px), (orientation:portrait) and (max-width:1024px)';
+var mobilVideo=matchMedia(MOBIL_SORGU).matches;
+var VIDEO_URL   = mobilVideo ? 'assets/hero-scrub-mobile.mp4'  : 'assets/hero-scrub.mp4';
+var VIDEO_BYTES = mobilVideo ? 807244                          : 2821036;
+var POSTER_URL  = mobilVideo ? 'assets/hero-poster-mobile.jpg' : 'assets/hero-poster.jpg';
+/* Hangi videonun yuklendigini isaretle: onceden kirpilmis surumun
+   kaydirilmaya ihtiyaci yok, ortalanmasi gerekiyor. */
+if(mobilVideo) document.documentElement.classList.add('mobil-video');
 
 var hero=document.getElementById('hero');
 var stage=document.getElementById('stage');
@@ -1671,11 +1688,11 @@ function wireReady(){
 function initHeroOnce(){
   if(videoStarted) return;
   videoStarted=true;
-  poster.style.backgroundImage="url('assets/hero-poster.jpg')";
+  poster.style.backgroundImage="url('"+POSTER_URL+"')";
   loadStart=performance.now();
   var started=false;
   function start(){if(started)return;started=true;initVideoSource();}
-  var pi=new Image();pi.onload=start;pi.onerror=start;pi.src='assets/hero-poster.jpg';
+  var pi=new Image();pi.onload=start;pi.onerror=start;pi.src=POSTER_URL;
   setTimeout(start,4000);
 }
 
